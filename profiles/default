@@ -1,0 +1,8 @@
+declare -a pathArray=([0]="empty")
+declare -a titleArray=([0]="empty")
+declare -a countArray=([0]="empty")
+declare -a currentEpArray=([0]="empty")
+declare -a statusArray=([0]="empty")
+declare -a timeStampArray=([0]="empty")
+declare -a totalRuntimeArray=([0]="empty")
+declare -a currentRuntimeArray=([0]="empty")
