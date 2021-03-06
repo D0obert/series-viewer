@@ -7,6 +7,7 @@ source ./profiles/default
 profileManager() {
 
     echo "Works"
+    loopMain 
 
 }
 
@@ -24,10 +25,10 @@ watchSeries() {
     tStamp=${timeStampArray[$wOpt]}
     wStatus=${statusArray[$wOpt]}
     CRT=${currenRuntimeArray[$wOpt]}
-    session=0
 
     #Set any other needed variables
     epArray=("empty")
+    session=0
 
     #Give the user the chance to start the series at a specific episode number
     if [ "$wStatus" == "Added" ]
@@ -117,13 +118,14 @@ watchSeries() {
 addSeries() {
 
     #When adding an "Atribute" to the faux data object, you must update all
-    #functions handling the data object and declare the attribute globally
-    #in main.sh. The list of functions to update are as below:
+    #functions handling the data object .The list of functions to update
+    #are as below:
     #
     #   1. addSeries()
     #   2. deleteSeries()
     #   3. clearList()
     #   4. exitSave()
+    #   5. updateAttribute() (Located in utilities.sh)
     #
     #All sections of code that need to be updated when adding an attribute 
     #Will be marked with [UPDATE ATTRIBUTE] 
@@ -360,6 +362,7 @@ seriesInfo() {
     cEp=${currentEpArray[$iOption]}
     updateProgBar $cEp ${countArray[$iOption]} ${statusArray[$iOption]} 
 
+    #Display all relevant information of selected series
     echo "
     Title: ${titleArray[$iOption]}
     Number of episodes: ${countArray[$iOption]}
@@ -386,7 +389,8 @@ exitSave() {
     #represented as an array index. This can be represented by a matrix where 
     #each column is an object and each row of that column is an attribute:
     #                                              #
-    #         Attributes:    1     2   3..         #
+    #                         Objects↓             #
+    #         Attributes↓    1     2   3..         #
     #                Path ["ex1","ex2",...]        #
     #               Title ["ex1","ex2",...]        #
     #               Count [exNum,exNum,...]        #
