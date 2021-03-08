@@ -1,13 +1,63 @@
 #!/bin/bash
 
-source ./profiles/default
+source ./profiles/$profile
+source ./profiles/config
+source profileOptions.sh
+source utilities.sh
 
 #Option functions - Main options available to user are processed here
 
 profileManager() {
 
-    echo "Works"
-    loopMain 
+    #Obtain a default profile if there is only one element in $profile
+    if [ "${#profile[@]}" == "1" ]
+    then
+           read -p "
+    No profiles detected, make a new one and set as default?
+
+    (Y/N)> " ans
+
+            yesNo "$ans" newProfile loopMain
+    else
+            count=0
+            echo "
+    All profiles:"
+            
+            #List all profiles in $profile (sans "default")
+            for i in ${!profile[@]}
+            do
+                    name=${profile[$i]}
+                    if [ "$name" != "default" ]
+                    then
+                            ((count+=1))
+                            if [ "$i" == "0" ]
+                            then #Indicate default profile
+                                    echo "    $count. $name (Default)"
+                            else
+                                    echo "    $count. $name"
+                            fi
+                    fi
+            done
+
+            #Obtain option for case
+            read -p "
+    Options:
+    [N] - New Profile
+    [S] - Set Default Profile
+    [D] - Delete Profile
+
+    > " profOpt
+
+    #Call corresponding function
+    case "$profOpt" in
+            "N" | "n") newProfile ;;
+            "S" | "s") switchProfile ;;
+            "D" | "d") deleteProfile ;;
+    esac
+
+    fi
+
+    loopMain
 
 }
 
@@ -188,7 +238,7 @@ listShows() {
     Currently stored shows:
     "
 
-    #loop throug titleArray and echo each element
+    #loop through titleArray and echo each element
     for i in ${!titleArray[@]}
     do
         if [ "${titleArray[$i]}" != "empty" ]
@@ -211,7 +261,7 @@ listShows() {
 #
 #   1. Obtain index of "Object" that needs to be deleted
 #   2. Create an empty temporary array and obtain total number of "Objects"
-#   3. Loop through all of the data arrays (Attribute) BY INDEX (Object)
+#   3. Loop through all of the data arrays (Attributes) BY INDEX (Object)
 #   4. For each "Attribute", check all "Object" index numbers against the 
 #      number obtained in step 1, if they are not, add the current "Object's"
 #      "Attribute" to the temporary array.
@@ -249,7 +299,7 @@ deleteSeries() {
     attrCount=8
 
     #Add any new attributes to args in identical format ${!<attributeName>[@]}
-    for i in ${!pathArray[@]} ${!titleArray[@]} ${!countArray[@]} ${!currentEpArray[@]} ${!statusArray[@]} ${!timeStampArray[@]} ${!totalRuntimeArray[@]} ${!currentRuntimeArray[@]}
+    for i in ${!pathArray[@]} ${!titleArray[@]} ${!countArray[@]} ${!currentEpArray[@]} ${!statusArray[@]} ${!timeStampArray[@]} ${!totalRuntimeArray[@]} ${!currentRuntimeArray[@]} 
     do
             ((currObj+=1))
 
@@ -303,19 +353,25 @@ deleteSeries() {
 }
 
 #Initialize data structure. Any future "object attributes" are set to empty here
+#Arguments:
+#$1 - -e (Escape confirmation)
 clearList() {
 
-    #Confirm before proceeding
-    read -p "
+    if [ "$1" != "-e" ]
+    then
+            #Confirm before proceeding
+            read -p "
     Are you sure you want to completely reset the list?
 
     (Y/N) > " ans
 
-    yesNo "$ans" return "loopMain -e"
+            yesNo "$ans" return loopMain
+    fi
 
     #==========================[UPDATE ATTRIBUTE]==========================# 
 
     #New attributes must be set as an array with index 0 = "empty"
+    profile=(${profile[@]})
     pathArray=("empty")
     titleArray=("empty")
     countArray=("empty")
@@ -325,7 +381,10 @@ clearList() {
     totalRuntimeArray=("empty")
     currentRuntimeArray=("empty")
 
-    loopMain -e
+    if [ "$1" != "-e" ]
+    then
+            loopMain -e
+    fi
 
 }
 
@@ -399,15 +458,17 @@ exitSave() {
     #                 ... ["...","...",...]        #
     #                                              #
     #==============[UPDATE ATTRIBUTE]==============#
+   
     
-    declare -p pathArray > ./profiles/default
-    declare -p titleArray >> ./profiles/default
-    declare -p countArray >> ./profiles/default
-    declare -p currentEpArray >> ./profiles/default
-    declare -p statusArray >> ./profiles/default
-    declare -p timeStampArray >> ./profiles/default
-    declare -p totalRuntimeArray >> ./profiles/default
-    declare -p currentRuntimeArray >> ./profiles/default
+    declare -p profile > ./profiles/config
+    declare -p pathArray > ./profiles/$profile
+    declare -p titleArray >> ./profiles/$profile
+    declare -p countArray >> ./profiles/$profile
+    declare -p currentEpArray >> ./profiles/$profile
+    declare -p statusArray >> ./profiles/$profile
+    declare -p timeStampArray >> ./profiles/$profile
+    declare -p totalRuntimeArray >> ./profiles/$profile
+    declare -p currentRuntimeArray >> ./profiles/$profile
 
     exit 1
 }

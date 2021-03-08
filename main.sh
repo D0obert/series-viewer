@@ -1,9 +1,12 @@
 #!/bin/bash
 # Main operator - Handles workflow
 
-source ./profiles/default
+#Source config for default profile
+source ./profiles/config
+source ./profiles/${profile[0]}
 source optFunctions.sh
 source utilities.sh
+source profileOptions
 
 firstLoop="1"
 cwd=$(pwd)

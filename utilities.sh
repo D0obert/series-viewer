@@ -26,7 +26,11 @@ yesNo() {
 
     case "$1" in
             "Y" | "y" | "") "$2" ;;
-            "N" | "n") "$3" ;;
+            "N" | "n")  if [ "$3" == "loopMain" ]
+                        then
+                                loopMain -e
+                        fi
+                        "$3" ;;
             *) echo "$1 is not a valid input" && loopMain ;;
     esac
 
@@ -57,6 +61,7 @@ updateAttribute() {
                             "-ts") tmp+=(${timeStampArray[$i]}) ;;
                             "-rt") tmp+=(${totalRuntimeArray[$i]}) ;;
                             "-crt") tmp+=(${currentRuntimeArray[$i]}) ;;
+                            "-pr") tmp+=
                     esac
             fi
             ((i+=1))
